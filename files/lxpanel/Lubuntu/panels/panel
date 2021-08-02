@@ -1,0 +1,128 @@
+# lxpanel <profile> config file. Manually editing is not recommended.
+# Use preference dialog in lxpanel to adjust config when you can.
+
+Global {
+  edge=bottom
+  allign=left
+  margin=0
+  widthtype=percent
+  width=100
+  height=26
+  transparent=1
+  tintcolor=#212121
+  alpha=255
+  setdocktype=1
+  setpartialstrut=1
+  usefontcolor=1
+  fontcolor=#ffffff
+  background=0
+  backgroundfile=/usr/share/lxpanel/images/lubuntu-background.png
+  iconsize=26
+}
+Plugin {
+  type=menu
+  Config {
+    image=/usr/share/icons/orb.png
+    system {
+    }
+    separator {
+    }
+    item {
+      command=run
+    }
+    separator {
+    }
+    item {
+      image=gnome-logout
+      command=logout
+    }
+  }
+}
+Plugin {
+  type=launchbar
+  Config {
+    Button {
+      id=pcmanfm.desktop
+    }
+    Button {
+      id=menu://applications/Administration/lxterminal.desktop
+    }
+    Button {
+      id=menu://applications/Office/libreoffice-writer.desktop
+    }
+    Button {
+      id=menu://applications/Internet/firefox.desktop
+    }
+  }
+}
+Plugin {
+  type=space
+  Config {
+    Size=4
+  }
+}
+Plugin {
+  type=taskbar
+  expand=1
+  Config {
+    tooltips=1
+    IconsOnly=0
+    AcceptSkipPager=1
+    ShowIconified=1
+    ShowMapped=1
+    ShowAllDesks=0
+    UseMouseWheel=1
+    UseUrgencyHint=1
+    FlatButton=0
+    MaxTaskWidth=150
+    spacing=1
+    GroupedTasks=1
+  }
+}
+Plugin {
+  type=xkb
+  Config {
+    Model=pc105
+    LayoutsList=us,ru
+    VariantsList=,
+    ToggleOpt=grp:alt_shift_toggle
+    KeepSysLayouts=0
+    DisplayType=1
+    FlagSize=2
+    NoResetOpt=1
+  }
+}
+Plugin {
+  type=tray
+  Config {
+  }
+}
+Plugin {
+  type=indicator
+  Config {
+    applications=1
+    datetime=0
+    messages=0
+    network=0
+    session=0
+    sound=1
+  }
+}
+Plugin {
+  type=dclock
+  Config {
+    ClockFmt=%R
+    TooltipFmt=%A %x
+    BoldFont=0
+    IconOnly=0
+    CenterText=0
+  }
+}
+Plugin {
+  type=launchbar
+  Config {
+    Button {
+      id=menu://applications/Other/shutdown.desktop
+    }
+  }
+}

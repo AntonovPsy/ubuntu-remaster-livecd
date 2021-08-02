@@ -1,0 +1,7 @@
+[Default Applications]
+application/xml=geany.desktop
+text/plain=leafpad.desktop
+
+[Added Associations]
+application/xml=geany.desktop;
+text/plain=leafpad.desktop;
