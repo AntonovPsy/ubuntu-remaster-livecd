@@ -1,0 +1,27 @@
+#!/bin/bash
+
+clear
+
+extract_iso(){
+	# mount and copy iso 
+	sudo mkdir /mnt/iso
+	sudo mount -o loop $LIVE_DIR/$ISO /mnt/iso
+	sudo rm -rf $ISO_DIR
+	sudo mkdir $ISO_DIR
+	echo ''
+	echo 'Copy iso files... Please wait.'
+	sudo cp -rf /mnt/iso/* $ISO_DIR/
+	sudo umount /mnt/iso
+	sudo rm -rf /mnt/iso
+}
+extract_sfs(){
+	# unsqush filesystem
+	echo ''
+	echo 'Unsquash Filesystem'
+	echo ''
+	sudo rm -rf $ROOT_DIR
+	mkdir $ROOT_DIR
+	sudo unsquashfs -f -d $ROOT_DIR $ISO_DIR/casper/filesystem.squashfs
+
+	echo 'FILESYSTEM UNSQUASHED'
+}

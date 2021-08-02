@@ -1,0 +1,132 @@
+#!/bin/bash
+
+chrt(){
+
+sudo mount --bind /proc $ROOT_DIR/proc
+sudo mount --bind /dev $ROOT_DIR/dev
+sudo mount --bind /sys $ROOT_DIR/sys
+
+# chroot settings file
+sudo tee $ROOT_DIR/settings.sh <<EOF
+#!/bin/bash
+
+# prepare
+export LC_ALL=C
+
+dbus-uuidgen > /var/lib/dbus/machine-id
+
+# install apps
+apt update
+apt install -y $APPS
+
+# удаляю лишнее
+apt -y purge blender
+apt -y purge sylpheed
+apt -y purge pidgin
+apt -y purge xpad
+apt -y purge hunspell-*
+apt -y install hunspell-ru
+apt -y purge mythes-*
+apt -y install mythes-ru
+apt -y purge transmission* transmission-gtk transmission-qt
+apt autoremove -y
+
+# SYSCTL.CONF
+cat /files/sysctl.conf | tee /etc/sysctl.conf
+
+# вносим системный звук пк в черный список
+echo 'blacklist pcspkr' | tee /etc/modprobe.d/blacklist-pcspkr.conf
+echo 'blacklist pcspkr' | tee /etc/modprobe.d/fbdev-blacklist.conf
+
+# настройки grub (тема и таймаут)
+mkdir /boot/grub/theme
+tar -xzf /files/my-grub-theme.tar.gz -C /boot/grub/theme/
+cat /files/grub | tee /etc/default/grub
+
+# Закидываем настройки
+tar -xzf /files/win-10-ico.tar.gz -C /usr/share/icons/
+cp -f /files/shutdown.desktop /usr/share/applications/
+cp -f /files/orb.png /usr/share/icons/
+mkdir -p /usr/share/fonts/win
+tar -xzf /files/fonts.tar.gz -C /usr/share/fonts/win
+tar -xzf /files/themes.tar.gz -C /usr/share/themes/
+
+## Обновляем кэш иконок, шрифтов
+gtk-update-icon-cache /usr/share/icons/win-10-ico/
+fc-cache -vf
+
+# Сначала создаем папки для настроек
+# После кидаем настройки
+mkdir -p /etc/skel/{.local/share/applications,.config/audacious,.config/clipit,.config/geany,.config/gpicview,.config/gtk-3.0,.config/leafpad,.config/libfm,.config/lxpanel/Lubuntu/panels,.config/lxsession/Lubuntu,.config/lxsession-default-apps,.config/lxterminal,.config/Mousepad,.config/openbox,.config/pcmanfm/lubuntu,.config/smplayer,.config/vlc,.config/xfce4/xfconf/xfce-perchannel-xml}
+
+tar -xzf /files/audacious-skin.tar.gz -C /etc/skel/.local/share/
+cat /files/audacious/config | tee /etc/skel/.config/audacious/config
+cat /files/audacious/playlist-state | tee /etc/skel/.config/audacious/playlist-state
+cat /files/bashrc | tee /etc/skel/.bashrc
+cat /files/clipit/clipitrc | tee /etc/skel/.config/clipit/clipitrc
+cat /files/geany/geany.conf | tee /etc/skel/.config/geany/geany.conf
+cat /files/gpicview/gpicview.conf | tee /etc/skel/.config/gpicview/gpicview.conf
+cat /files/gtk-3.0/settings.ini | tee /etc/skel/.config/gtk-3.0/settings.ini
+cat /files/leafpad/leafpadrc | tee /etc/skel/.config/leafpad/leafpadrc
+cat /files/libfm/libfm.conf | tee /etc/skel/.config/libfm/libfm.conf
+cat /files/lxpanel/launchtaskbar.cfg | tee /etc/skel/.config/lxpanel/launchtaskbar.cfg
+cat /files/lxpanel/Lubuntu/panels/panel | tee /etc/skel/.config/lxpanel/Lubuntu/panels/panel
+cat /files/lxsession/Lubuntu/desktop.conf | tee /etc/skel/.config/lxsession/Lubuntu/desktop.conf
+cat /files/lxsession-default-apps/settings.conf | tee /etc/skel/.config/lxsession-default-apps/settings.conf
+cat /files/lxterminal/lxterminal.conf | tee /etc/skel/.config/lxterminal/lxterminal.conf
+cat /files/Mousepad/accels.scm | tee /etc/skel/.config/Mousepad/accels.scm
+cat /files/openbox/lubuntu-rc.xml | tee /etc/skel/.config/openbox/lubuntu-rc.xml
+cat /files/pcmanfm/lubuntu/pcmanfm.conf | tee /etc/skel/.config/pcmanfm/lubuntu/pcmanfm.conf
+cat /files/pcmanfm/lubuntu/desktop-items-0.conf | tee /etc/skel/.config/pcmanfm/lubuntu/desktop-items-0.conf
+cat /files/smplayer/playlist.ini | tee /etc/skel/.config/smplayer/playlist.ini
+cat /files/smplayer/smplayer.ini | tee /etc/skel/.config/smplayer/smplayer.ini
+cat /files/vlc/vlc-qt-interface.conf | tee /etc/skel/.config/vlc/vlc-qt-interface.conf
+cat /files/vlc/vlcrc | tee /etc/skel/.config/vlc/vlcrc
+cat /files/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml | tee /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml
+cat /files/xfce4/xfconf/xfce-perchannel-xml/parole.xml | tee /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/parole.xml
+cat /files/mimeapps.list | tee /etc/skel/.config/mimeapps.list
+cat /files/mimeapps2.list | tee /etc/skel/.local/share/applications/mimeapps.list
+
+cat /files/lightdm/lightdm-gtk-greeter.conf | tee /etc/lightdm/lightdm-gtk-greeter.conf
+
+# Отключаем ненужные службы из автозапуска
+systemctl disable apt-daily
+systemctl disable apt-daily-upgrade
+systemctl disable apport
+systemctl disable apport-autoreport
+systemctl disable NetworkManager-wait-online
+systemctl disable rsyslog
+systemctl disable ufw
+
+
+rm -f /etc/xdg/autostart/update-notifier.desktop
+
+# clean and exit
+apt-get clean
+rm /var/lib/dbus/machine-id && rm -rf /tmp/*
+echo '' > /etc/resolv.conf
+
+# exit from chroot
+exit
+
+EOF
+
+sudo chmod +x $ROOT_DIR/settings.sh
+
+sudo cp -f /etc/resolv.conf $ROOT_DIR/etc/resolv.conf
+sudo cp -rf $FILES_DIR $ROOT_DIR/
+
+sudo chroot $ROOT_DIR su -lc /settings.sh
+
+sudo rm -f $ROOT_DIR/settings.sh
+sudo rm -rf $ROOT_DIR/files
+
+sudo umount -lR $ROOT_DIR/proc
+sudo umount -lR $ROOT_DIR/dev
+sudo umount -lR $ROOT_DIR/sys
+
+sudo rm -rf $ROOT_DIR/proc/*
+sudo rm -rf $ROOT_DIR/dev/*
+sudo rm -rf $ROOT_DIR/sys/*
+
+}

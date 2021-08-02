@@ -1,0 +1,32 @@
+#!/bin/bash
+
+sfs(){
+
+	sudo rm -f $ISO_DIR/casper/filesystem.squashfs
+
+	sudo mksquashfs $ROOT_DIR/ $ISO_DIR/casper/filesystem.squashfs
+
+}
+
+iso(){
+	sudo rm -f $LIVE_DIR/$ISO_NAME
+
+	sudo xorriso -as mkisofs \
+	  -r -J -V "$ISO_NAME" \
+	  -b isolinux/isolinux.bin \
+	  -c isolinux/boot.cat \
+	  -no-emul-boot \
+	  -partition_offset 16 \
+	  -boot-load-size 4 \
+	  -boot-info-table \
+	  -isohybrid-mbr "/usr/lib/ISOLINUX/isohdpfx.bin" \
+	  -o $LIVE_DIR/$ISO_NAME \
+	  $ISO_DIR
+}
+
+clean(){
+	echo ''
+	echo 'Please wait, I am cleaning...'
+	sudo rm -rf $ISO_DIR
+	sudo rm -rf $ROOT_DIR
+}

@@ -1,0 +1,103 @@
+#!/bin/bash
+
+clear
+
+LIVE_DIR="/home/$USER/live-lub16"
+SCRIPTS_DIR="/home/$USER/live-lub16/scripts"
+FILES_DIR="/home/$USER/live-lub16/files"
+APPS='gnome-themes-standard catfish menulibre audacity audacious audacious-plugins vlc openshot kazam youtube-dl mediainfo-gui recordmydesktop gtk-recordmydesktop soundconverter ffmpeg winff easytag libreoffice libreoffice-l10n-ru evince retext pdfmod fbreader gscan2pdf geany imagemagick mousepad pandoc gimp inkscape filezilla qbittorrent python3 python3-pip python3-pyqt5 rkhunter testdisk zenity wget git curl gparted gufw openjdk-8-jdk qemu build-essential xorriso syslinux squashfs-tools isolinux exfat-fuse exfat-utils libgtk2.0-bin sysv-rc-conf'
+
+source $SCRIPTS_DIR/01-extract
+source $SCRIPTS_DIR/02-chroot
+source $SCRIPTS_DIR/03-build
+
+architecture(){
+	echo ''
+	echo "Выберите архитектуру системы (i386 - x32 или amd64 - x64)?"
+	echo ''
+	read -n 1 -p "Введите ваш выбор [1 - i386, 2 - amd64]: " answer
+	echo ''
+	echo ''
+
+	case $answer in
+		1 )
+			source $SCRIPTS_DIR/settings32.sh
+			menu
+		;;
+		2 )
+			source $SCRIPTS_DIR/settings64.sh
+			menu
+		;;
+		* )
+			architecture
+		;;
+	esac
+}
+
+menu(){
+	echo -e "\e[1;33m"
+	echo "                 Lubuntu 16.04 Xenial Xerus Remastering"
+	echo ''
+	echo ''
+	echo ' 1. Распаковать iso'
+	echo ' 2. Распаковать систему filesystem.squashfs (unsquashfs -f -d -dest-dir-)'
+	echo ' 3. Выполнить chroot для установки настроек и программ'
+	echo ' 4. Собрать систему в новый filesystem.squashfs (mksquashfs)'
+	echo ' 5. Собрать новый iso'
+	echo ' 6. Очистка (удалить папки распакованной системы: iso и sqashfs)'
+	echo ' 0. Выход из программы'
+	echo ''
+	echo -e "\e[0m"
+	
+	read -n1 -p 'Введите ваш выбор [номер пункта меню]: ' input
+
+	echo ''
+
+	case $input in
+		1) 
+			extract_iso
+			echo ''
+			echo 'ISO EXTRACTION COMPLETE'
+			echo ''
+			menu
+		;;
+		2)
+			extract_sfs
+			echo ''
+			echo 'FILESYSTEM.SQUASHFS EXTRACTION COMPLETE'
+			echo ''
+			menu
+		;;
+		3)
+			chrt
+			echo ''
+			echo 'CHROOT SETTINGS COMPLETE'
+			echo ''
+			menu
+		;;
+		4)
+			sfs
+			echo ''
+			echo 'NEW FILESYSETM.SQUASHFS BUILD COMPLETE'
+			echo ''
+			menu
+		;;
+		5)
+			iso
+			echo ''
+			echo 'REMASRERED ISO BUILD COMPLETE'
+			echo ''
+			menu
+		;;
+		6)
+			clean
+			echo ''
+			echo 'CLEANING COMPLETE'
+			echo ''
+			menu
+		;;
+		*) exit 0 ;;
+	esac
+}
+
+architecture
