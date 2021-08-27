@@ -4,12 +4,39 @@ sfs(){
 
 	sudo rm -f $ISO_DIR/casper/filesystem.squashfs
 
-	sudo mksquashfs $ROOT_DIR/ $ISO_DIR/casper/filesystem.squashfs
+	sudo mksquashfs $ROOT_DIR/ $ISO_DIR/casper/filesystem.squashfs -comp lz4
 
 }
 
 iso(){
 	sudo rm -f $LIVE_DIR/$ISO_NAME
+	
+	# создаем filesystem.manifest
+	sudo chroot $ROOT_DIR dpkg-query -W --showformat='${Package} ${Version}\n' | sudo tee $ISO_DIR/casper/filesystem.manifest
+	sudo cp -v $ISO_DIR/casper/filesystem.manifest $ISO_DIR/casper/filesystem.manifest-desktop
+	
+	# удаляем список пакетов установщика для десктопной версии взят из файла iso/casper/filesystem.manifest-remove
+	#REMOVE='ubiquity ubiquity-frontend-gtk ubiquity-frontend-kde casper lupin-casper live-initramfs user-setup discover1 xresprobe os-prober libdebian-installer4'
+	REMOVE='apt-clone archdetect-deb b43-fwcutter binutils btrfs-tools casper cifs-utils cryptsetup cryptsetup-bin dmeventd dmraid dmsetup xfsprogs  dpkg-repack ecryptfs-utils efibootmgr feh fwupdate fwupdate-signed gir1.2-json-1.0 gir1.2-networkmanager-1.0 gir1.2-nma-1.0 gir1.2-timezonemap-1.0 gir1.2-xkl-1.0 grub-common grub-gfxpayload-lists grub-pc grub-pc-bin grub2-common keyutils kpartx kpartx-boot jfsutils language-pack-en language-pack-en-base language-pack-gnome-en language-pack-gnome-en-base libdebian-installer4 libdevmapper-event1.02.1 libdmraid1.0.0.rc16 libecryptfs1 libefivar0 libfwup0 libgtkmm-2.4-1v5 liblvm2app2.2 liblvm2cmd2.02 libnm-glib4 libnm-util2 libnss3-1d libreadline5 libtimezonemap-data libtimezonemap1 linux-wlan-ng linux-wlan-ng-doc localechooser-data lubuntu-live-settings lupin-casper lvm2 os-prober pptp-linux python3-icu python3-pam rdate reiserfsprogs samba-common sbsigntool secureboot-db setserial ubiquity ubiquity-casper ubiquity-frontend-gtk ubiquity-slideshow-lubuntu ubiquity-ubuntu-artwork user-setup wamerican zram-config'
+	for i in $REMOVE
+	do
+			sudo sed -i "/${i}/d" $ISO_DIR/casper/filesystem.manifest-desktop
+	done
+	
+	NOTREMOVE='libparted-fs-resize0 gparted'
+	for i in $NOTREMOVE
+	do
+			sudo sed -i "/${i}/d" $ISO_DIR/casper/filesystem.manifest-remove
+	done
+	
+	# обновляем файл filesystem.size
+	printf $(sudo du -sx --block-size=1 $ROOT_DIR | cut -f1) > $ISO_DIR/casper/filesystem.size
+	
+	# считаем md5 hash сумму
+	cd $ISO_DIR
+	sudo rm md5sum.txt
+	find . -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
+	cd
 
 	sudo xorriso -as mkisofs \
 	  -r -J -V "$ISO_NAME" \

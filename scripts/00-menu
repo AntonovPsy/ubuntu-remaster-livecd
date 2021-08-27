@@ -5,7 +5,7 @@ clear
 LIVE_DIR="/home/$USER/live-lub16"
 SCRIPTS_DIR="/home/$USER/live-lub16/scripts"
 FILES_DIR="/home/$USER/live-lub16/files"
-APPS='gnome-themes-standard catfish menulibre audacity audacious audacious-plugins vlc openshot kazam youtube-dl mediainfo-gui recordmydesktop gtk-recordmydesktop soundconverter ffmpeg winff easytag libreoffice libreoffice-l10n-ru evince retext pdfmod fbreader gscan2pdf geany imagemagick mousepad pandoc gimp inkscape filezilla qbittorrent python3 python3-pip python3-pyqt5 rkhunter testdisk zenity wget git curl gparted gufw openjdk-8-jdk qemu build-essential xorriso syslinux squashfs-tools isolinux exfat-fuse exfat-utils libgtk2.0-bin sysv-rc-conf'
+APPS='gnome-themes-standard catfish menulibre audacity audacious audacious-plugins vlc openshot kazam youtube-dl mediainfo-gui recordmydesktop gtk-recordmydesktop soundconverter ffmpeg winff easytag libreoffice libreoffice-l10n-ru evince pdfmod fbreader gscan2pdf geany imagemagick gimp inkscape firefox firefox-locale-ru filezilla qbittorrent python3 python3-pip python3-pyqt5 rkhunter testdisk zenity wget git curl gparted gufw openjdk-8-jdk qemu build-essential xorriso syslinux squashfs-tools isolinux exfat-fuse exfat-utils libgtk2.0-bin sysv-rc-conf language-pack-ru language-pack-ru-base language-pack-gnome-ru language-pack-gnome-ru-base'
 
 source $SCRIPTS_DIR/01-extract
 source $SCRIPTS_DIR/02-chroot

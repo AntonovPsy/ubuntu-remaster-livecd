@@ -28,6 +28,7 @@ apt -y purge hunspell-*
 apt -y install hunspell-ru
 apt -y purge mythes-*
 apt -y install mythes-ru
+apt -y purge postfix
 apt -y purge transmission* transmission-gtk transmission-qt
 apt autoremove -y
 
@@ -91,9 +92,13 @@ cat /files/lightdm/lightdm-gtk-greeter.conf | tee /etc/lightdm/lightdm-gtk-greet
 
 # Отключаем ненужные службы из автозапуска
 systemctl disable apt-daily
+systemctl disable apt-daily.timer
 systemctl disable apt-daily-upgrade
+systemctl disable apt-daily-upgrade.timer
 systemctl disable apport
 systemctl disable apport-autoreport
+systemctl disable motd-news
+systemctl disable motd-news.timer
 systemctl disable NetworkManager-wait-online
 systemctl disable rsyslog
 systemctl disable ufw
